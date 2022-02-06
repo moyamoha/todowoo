@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 from .models import Todo
+from .utils import password_is_too_short
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
@@ -20,6 +21,8 @@ def signupuser(request):
   else:
     # create new user
     if request.POST['password1'] == request.POST['password2']:
+      if password_is_too_short(request.POST['password1']):
+        return render(request, "todo/signupuser.html", {"form": UserCreationForm(), "error": "Password should be at least 8 characters long"})
       try:
         user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
         user.save()
